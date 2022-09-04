@@ -62,25 +62,13 @@ sur_setup = gmsh.model.geo.addPlaneSurface([wTunnel,mainSail, headSail])
 ids = gmsh.model.geo.extrude([(2,sur_setup)], 0, 0, 1, numElements=[1], recombine=True)
 print("IDS:", ids)
 
-gmsh.model.geo.addPhysicalGroup(1, [1], name="outlet")
-gmsh.model.geo.addPhysicalGroup(1, [2,4], name="walls")
-gmsh.model.geo.addPhysicalGroup(1, [3], name="inlet")
-gmsh.model.geo.addPhysicalGroup(1, [5,6], name="airfoil")
-gmsh.model.geo.addPhysicalGroup(1, [38], name="1-1")
-gmsh.model.geo.addPhysicalGroup(1, [17], name="1-2")
-gmsh.model.geo.addPhysicalGroup(1, [21], name="1-3")
-gmsh.model.geo.addPhysicalGroup(1, [25], name="1-4")
-gmsh.model.geo.addPhysicalGroup(1, [29], name="1-5")
-gmsh.model.geo.addPhysicalGroup(1, [33], name="1-6")
-gmsh.model.geo.addPhysicalGroup(1, [37], name="1-7")
+gmsh.model.geo.addPhysicalGroup(3, [ ids[1][1] ], name="volume")
+gmsh.model.geo.addPhysicalGroup(2, [ ids[2][1] ], name="outlet")
+gmsh.model.geo.addPhysicalGroup(2, [ ids[3][1], ids[5][1] ], name="walls")
+gmsh.model.geo.addPhysicalGroup(2, [ ids[4][1] ], name="inlet")
 
-
-#Physical Surface("outlet") = {ids[2]};
-#Physical Surface("walls") = {ids[{3, 5}]};
-#Physical Surface("inlet") = {ids[4]};
-#Physical Surface("airfoil") = {ids[{6,7}]};
-#Physical Surface("frontAndBack") = {ids[0], TwoDimSurf};
-#Physical Volume("volume") = {ids[1]};
+gmsh.model.geo.addPhysicalGroup(2, [ ids[6][1] ], name="mainsail")
+gmsh.model.geo.addPhysicalGroup(2, [ ids[7][1] ], name="headsail")
 
 
 # Create the relevant Gmsh data structures 
