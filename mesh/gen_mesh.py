@@ -23,10 +23,13 @@ def windTunnel(length, height, lc):
 
   return l_loop
 
-def foil(fname, scale, dx, dy, aoa):
+def foil(fname, scale, pos, aoa):
   foil = open(fname, 'r')
   lc = 0.1
   points = []
+
+  dx = pos[0]
+  dy = pos[1]
 
   rot_axis = np.array([0,0,1])
   rot_rad = np.radians(aoa)
@@ -50,15 +53,26 @@ def foil(fname, scale, dx, dy, aoa):
   return l_loop
  
   
-wTunnel = windTunnel(40,20, 1)
-mainSail = foil('mesh/foil.dat',scale=6.22, dx=0, dy=0, aoa=25)
-headSail = foil('mesh/foil.dat',scale=6.20, dx=-5, dy=0, aoa=26)
+awa = -35
+mainSailPos = [0,0,0]
+headSailPos = [-6,0,0]
+
+rot_axis = np.array([0,0,1])
+rot_rad = np.radians(awa)
+rot_vector = rot_axis * rot_rad
+rot = Rotation.from_rotvec(rot_vector)
+mainSailPos = rot.apply(mainSailPos)
+headSailPos = rot.apply(headSailPos)
+
+wTunnel = windTunnel(80,50, 1.0)
+mainSail = foil('mesh/foil.dat',scale=6.22, pos=mainSailPos, aoa=awa+8)
+headSail = foil('mesh/headsail.dat',scale=6.20, pos=headSailPos, aoa=awa+15)
 
 sur_setup = gmsh.model.geo.addPlaneSurface([wTunnel,mainSail, headSail])
 
 #addPlaneSurface returns the surface tag; extrude takes a list of (dim, tag) pairs as input. This is why (2,sur_setup)
 #numElements=[1] is like Layers{1} in Extrude
-ids = gmsh.model.geo.extrude([(2,sur_setup)], 0, 0, 1, numElements=[1], recombine=True)
+ids = gmsh.model.geo.extrude([(2,sur_setup)], 0, 0, 10, numElements=[1], recombine=True)
 print("IDS:", ids)
 
 gmsh.model.geo.addPhysicalGroup(3, [ ids[1][1] ], name="volume")
