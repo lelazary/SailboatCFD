@@ -38,7 +38,12 @@ boundaryField
         value           uniform 0;
     }
 
-    airfoil
+    mainsail 
+    {
+        type            fixedValue;
+        value           uniform 0;
+    }
+    headsail 
     {
         type            fixedValue;
         value           uniform 0;

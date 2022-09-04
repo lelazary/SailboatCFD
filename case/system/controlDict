@@ -54,7 +54,7 @@ functions
         writeControl    timeStep;
         writeInterval   10;
         log             true;
-        patches         (airfoil);
+        patches         (mainsail);
         rho             rhoInf;      // Indicates incompressible.
         rhoInf          1.18;        // Redundant for incompressible (value does not matter).
         liftDir         (0 1 0);

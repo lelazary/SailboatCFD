@@ -37,7 +37,12 @@ boundaryField
         type            zeroGradient;
     }
 
-    airfoil
+    mainsail
+    {
+        type            zeroGradient;
+    }
+
+    headsail 
     {
         type            zeroGradient;
     }

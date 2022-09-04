@@ -37,7 +37,12 @@ boundaryField
         type            noSlip;
     }
 
-    airfoil
+    mainsail 
+    {
+        type            noSlip;
+    }
+
+    headsail 
     {
         type            noSlip;
     }

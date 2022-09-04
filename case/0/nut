@@ -38,7 +38,12 @@ boundaryField
         value           uniform 0;
     }
 
-    airfoil
+    mainsail 
+    {
+        type            nutUSpaldingWallFunction;
+        value           uniform 0;
+    }
+    headsail 
     {
         type            nutUSpaldingWallFunction;
         value           uniform 0;

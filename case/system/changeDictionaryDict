@@ -20,7 +20,12 @@ boundary
         type patch;
         physicalType patch;
     }
-    airfoil
+    mainsail 
+    {
+        type wall;
+        physicalType wall;
+    }
+    headsail 
     {
         type wall;
         physicalType wall;

@@ -6,7 +6,7 @@ from scipy.spatial.transform import Rotation as Rotation
 import sys
 
 gmsh.initialize()
-
+gmsh.option.setNumber("Mesh.MshFileVersion", 2)
 
 def windTunnel(length, height, lc):
   p1 = gmsh.model.geo.addPoint(length/2, -height/2, 0,lc)
@@ -38,7 +38,6 @@ def foil(fname, scale, dx, dy, aoa):
     point = [scale*float(p_str[0]), scale*float(p_str[1]), 0]
 
     point = rot.apply(point)
-    print(point)
     
     gp = gmsh.model.geo.add_point(point[0]+dx, point[1]+dy, point[2], lc)
     points.append(gp)
@@ -52,8 +51,8 @@ def foil(fname, scale, dx, dy, aoa):
  
   
 wTunnel = windTunnel(40,20, 1)
-mainSail = foil('foil.dat',scale=6.22, dx=0, dy=0, aoa=25)
-headSail = foil('foil.dat',scale=6.20, dx=-5, dy=0, aoa=26)
+mainSail = foil('mesh/foil.dat',scale=6.22, dx=0, dy=0, aoa=25)
+headSail = foil('mesh/foil.dat',scale=6.20, dx=-5, dy=0, aoa=26)
 
 sur_setup = gmsh.model.geo.addPlaneSurface([wTunnel,mainSail, headSail])
 
@@ -63,10 +62,10 @@ ids = gmsh.model.geo.extrude([(2,sur_setup)], 0, 0, 1, numElements=[1], recombin
 print("IDS:", ids)
 
 gmsh.model.geo.addPhysicalGroup(3, [ ids[1][1] ], name="volume")
+gmsh.model.geo.addPhysicalGroup(2, [ ids[0][1], sur_setup ], name="frontAndBack")
 gmsh.model.geo.addPhysicalGroup(2, [ ids[2][1] ], name="outlet")
 gmsh.model.geo.addPhysicalGroup(2, [ ids[3][1], ids[5][1] ], name="walls")
 gmsh.model.geo.addPhysicalGroup(2, [ ids[4][1] ], name="inlet")
-
 gmsh.model.geo.addPhysicalGroup(2, [ ids[6][1] ], name="mainsail")
 gmsh.model.geo.addPhysicalGroup(2, [ ids[7][1] ], name="headsail")
 
@@ -78,14 +77,14 @@ gmsh.model.geo.synchronize()
   
 # Creates  graphical user interface
  
-if "-nopopup" not in sys.argv:
+if "-mesh" not in sys.argv:
   gmsh.fltk.run()
 else:
   # Generate mesh:
-  gmsh.model.mesh.generate()
+  gmsh.model.mesh.generate(dim=3)
   
   # Write mesh data:
-  gmsh.write("GFG.msh")
+  gmsh.write("main.msh")
 
 # It finalize the Gmsh API
 gmsh.finalize()
