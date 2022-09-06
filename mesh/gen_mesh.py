@@ -68,7 +68,7 @@ def gen_sail(pos, aoa, chord=1, camber=0.10, draft=0.50, leading_angle=50, trail
   c2 =  Yd/np.tan((90-leading_angle)*np.pi/180)
   c3 =  Yd/np.tan((90-trailing_angle)*np.pi/180)
   
-  thickness = 0.01
+  thickness = 0.1
   
   p1 = gmsh.model.geo.addPoint(0,0,0, lc)
   p2 = gmsh.model.geo.addPoint(c2,Yd,0, lc)
@@ -103,9 +103,10 @@ def gen_sail(pos, aoa, chord=1, camber=0.10, draft=0.50, leading_angle=50, trail
 
   return l_loop
   
-awa = -35
+awa = -130
 mainSailPos = [0,0,0]
-headSailPos = [-6/6.20,0,0]
+headSailPos = [-5.630,0,0]
+staySailPos = [-4.383, 0, 0]
 
 rot_axis = np.array([0,0,1])
 rot_rad = np.radians(awa)
@@ -115,36 +116,30 @@ mainSailPos = rot.apply(mainSailPos)
 headSailPos = rot.apply(headSailPos)
 
 surfaces = []
-wTunnel = windTunnel(20,20, 1.0)
+wTunnel = windTunnel(100,100, 2.0)
 surfaces.append(wTunnel)
-#mainSail = foil('mesh/foil.dat',scale=6.22, pos=mainSailPos, aoa=awa+8)
-#headSail = foil('mesh/headsail.dat',scale=6.20, pos=headSailPos, aoa=awa+15)
-#mainSail = foil('mesh/foil_NACA1408.dat',scale=1, pos=mainSailPos, aoa=-10, lc=0.01)
-#surfaces.append(mainSail)
 
-headSail = gen_sail(pos=headSailPos, aoa=-20)
+#headSail = gen_sail(pos=headSailPos, aoa=awa+20, chord=6.2, camber=0.90/6.2, draft=2.54/6.2, leading_angle=50, trailing_angle=70, lc=0.1)
+headSail = gen_sail(pos=headSailPos, aoa=awa+46, chord=10, camber=0.90/6.2, draft=2.54/6.2, leading_angle=50, trailing_angle=70, lc=0.1)
 surfaces.append(headSail)
 
-mainSail = gen_sail(pos=mainSailPos, aoa=-20)
+mainSail = gen_sail(pos=mainSailPos, aoa=awa+25, chord=6.1, camber=0.50/6.2, draft=1.54/6.2, leading_angle=50, trailing_angle=70, lc=0.1)
 surfaces.append(mainSail)
-
-#headSail = foil('mesh/headsail.dat',scale=1, pos=headSailPos, aoa=awa+15)
-#surfaces.append(headSail)
 
 surface_2d = gmsh.model.geo.addPlaneSurface(surfaces)
 
 #addPlaneSurface returns the surface tag; extrude takes a list of (dim, tag) pairs as input. This is why (2,surface_2d)
 #numElements=[1] is like Layers{1} in Extrude
-#ids = gmsh.model.geo.extrude([(2,surface_2d)], 0, 0, 10, numElements=[1], recombine=True)
-#print("IDS:", ids)
+ids = gmsh.model.geo.extrude([(2,surface_2d)], 0, 0, 10, numElements=[1], recombine=True)
+print("IDS:", ids)
 
-#gmsh.model.geo.addPhysicalGroup(3, [ ids[1][1] ], name="volume")
-#gmsh.model.geo.addPhysicalGroup(2, [ ids[0][1], surface_2d ], name="frontAndBack")
-#gmsh.model.geo.addPhysicalGroup(2, [ ids[2][1] ], name="outlet")
-#gmsh.model.geo.addPhysicalGroup(2, [ ids[3][1], ids[5][1] ], name="walls")
-#gmsh.model.geo.addPhysicalGroup(2, [ ids[4][1] ], name="inlet")
-##gmsh.model.geo.addPhysicalGroup(2, [ ids[6][1] ], name="mainsail")
-##gmsh.model.geo.addPhysicalGroup(2, [ ids[7][1] ], name="headsail")
+gmsh.model.geo.addPhysicalGroup(3, [ ids[1][1] ], name="volume")
+gmsh.model.geo.addPhysicalGroup(2, [ ids[0][1], surface_2d ], name="frontAndBack")
+gmsh.model.geo.addPhysicalGroup(2, [ ids[2][1] ], name="outlet")
+gmsh.model.geo.addPhysicalGroup(2, [ ids[3][1], ids[5][1] ], name="walls")
+gmsh.model.geo.addPhysicalGroup(2, [ ids[4][1] ], name="inlet")
+gmsh.model.geo.addPhysicalGroup(2, [ ids[6][1] ], name="headsail")
+gmsh.model.geo.addPhysicalGroup(2, [ ids[7][1] ], name="mainsail")
 
 
 # Create the relevant Gmsh data structures 

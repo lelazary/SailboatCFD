@@ -1,15 +1,12 @@
 #!/bin/sh
 
-# Quit script if any step has error:
+# Quit on error :
 set -e
 
-# Make the mesh:
-#gmsh mesh/main.geo -3 -format msh2 -o main.msh
 ./mesh/gen_mesh.py -mesh
 # Convert the mesh to OpenFOAM format:
 gmshToFoam main.msh -case case
-# Adjust polyMesh/boundary:
+# Change the patches that gmsh generate so openfoam can read them
 changeDictionary -case case
-# Finally, run the simulation:
+# Run Sim
 simpleFoam -case case
-
